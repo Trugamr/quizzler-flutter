@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import "package:rflutter_alert/rflutter_alert.dart";
 import 'quiz.dart';
 
 void main() {
@@ -35,18 +36,42 @@ class _QuizPageState extends State<QuizPage> {
   List<Icon> scoreKeeper = [];
 
   void nextQuestion({bool playerAnswer}) {
-    if (quiz.getQuestionAnswer() == playerAnswer)
-      scoreKeeper.add(
-        Icon(Icons.check, color: Colors.green),
-      );
-    else
-      scoreKeeper.add(
-        Icon(Icons.close, color: Colors.red),
-      );
+    setState(() {
+      if (quiz.isFinished()) {
+        scoreKeeper.clear();
+        quiz.reset();
+        Alert(
+          context: context,
+          title: 'Finished!',
+          desc: 'You\'ve reached the end of the quiz.',
+          style: AlertStyle(
+            animationType: AnimationType.fromTop,
+          ),
+          buttons: [
+            DialogButton(
+              child: Text(
+                "RESTART",
+                style: TextStyle(color: Colors.white, fontSize: 16.0),
+              ),
+              onPressed: () => Navigator.pop(context),
+              color: Colors.green,
+              radius: BorderRadius.circular(8.0),
+            ),
+          ],
+        ).show();
+      } else {
+        if (quiz.getQuestionAnswer() == playerAnswer)
+          scoreKeeper.add(
+            Icon(Icons.check, color: Colors.green),
+          );
+        else
+          scoreKeeper.add(
+            Icon(Icons.close, color: Colors.red),
+          );
 
-    setState(
-      () => {quiz.nextQuestion()},
-    );
+        quiz.nextQuestion();
+      }
+    });
   }
 
   RaisedButton buildButton({String text, Color color, VoidCallback onPressed}) {
