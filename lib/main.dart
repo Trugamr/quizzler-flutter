@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'quiz.dart';
 
 void main() {
   runApp(QuizzlerApp());
@@ -30,7 +31,23 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
+  Quiz quiz = new Quiz();
   List<Icon> scoreKeeper = [];
+
+  void nextQuestion({bool playerAnswer}) {
+    if (quiz.getQuestionAnswer() == playerAnswer)
+      scoreKeeper.add(
+        Icon(Icons.check, color: Colors.green),
+      );
+    else
+      scoreKeeper.add(
+        Icon(Icons.close, color: Colors.red),
+      );
+
+    setState(
+      () => {quiz.nextQuestion()},
+    );
+  }
 
   RaisedButton buildButton({String text, Color color, VoidCallback onPressed}) {
     return RaisedButton(
@@ -59,7 +76,7 @@ class _QuizPageState extends State<QuizPage> {
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Text(
-                      'This is where the question will go. You need to anwer it as true of false.',
+                      quiz.getQuestionText(),
                       style: TextStyle(
                         fontSize: 22.0,
                         color: Colors.white,
@@ -75,14 +92,7 @@ class _QuizPageState extends State<QuizPage> {
                   padding: EdgeInsets.only(
                       top: 20.0, bottom: 8.0, left: 20.0, right: 20.0),
                   child: buildButton(
-                    onPressed: () => setState(
-                      () => scoreKeeper.add(
-                        Icon(
-                          Icons.check,
-                          color: Colors.green,
-                        ),
-                      ),
-                    ),
+                    onPressed: () => nextQuestion(playerAnswer: true),
                     text: 'True',
                     color: Colors.green,
                   ),
@@ -93,14 +103,7 @@ class _QuizPageState extends State<QuizPage> {
                   padding: EdgeInsets.only(
                       top: 8.0, bottom: 20.0, left: 20.0, right: 20.0),
                   child: buildButton(
-                    onPressed: () => setState(
-                      () => scoreKeeper.add(
-                        Icon(
-                          Icons.close,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ),
+                    onPressed: () => nextQuestion(playerAnswer: false),
                     text: 'False',
                     color: Colors.red,
                   ),
@@ -113,10 +116,8 @@ class _QuizPageState extends State<QuizPage> {
         Container(
           height: 40.0,
           padding: EdgeInsets.only(bottom: 16.0, left: 20.0, right: 20.0),
-          child: Expanded(
-            child: Row(
-              children: scoreKeeper,
-            ),
+          child: Row(
+            children: scoreKeeper,
           ),
         )
       ],
